@@ -39,6 +39,7 @@ enum ReservationError: Error {
     case error1
     case error2
     case error3
+    case error4
 }
 
 // Clase para la gestión de las reservas
@@ -71,7 +72,11 @@ class HotelReservationManager {
             duration: duration,
             price: totalPrice,
             breakfast: breakfast)
-    
+        
+        // Comprobar entrada de parámetros
+        guard !(hotelName == "" || clients.isEmpty || duration < 1 || price < 0) else {
+            throw ReservationError.error4
+        }
         // Comprobar id único
         guard !listIds.contains(newReservation.idUnic) else {
             throw ReservationError.error1
@@ -133,6 +138,7 @@ let client7 = Client(name: "Yamcha", age: 47, heightInCm: 183)
 let client8 = Client(name: "Piccolo", age: 31, heightInCm: 226)
 let client9 = Client(name: "Videl", age: 27, heightInCm: 157)
 let client10 = Client(name: "Trunks", age: 31, heightInCm: 170)
+let client11 = Client(name: "Mr Satan", age: 44, heightInCm: 188)
 
 
 let reservationManager = HotelReservationManager()
@@ -154,7 +160,9 @@ func testAddReservation() {
     }catch ReservationError.error2 {
         print("Error cliente ya con una reserva")
     }catch ReservationError.error3{
-        print("Reserva no existente")
+        print("Error eserva no existe")
+    }catch ReservationError.error4{
+        print("Error entrada de parámetros")
     }catch{
         print("Error inexperado")
     }
@@ -185,7 +193,9 @@ func testCancelRservation() {
     }catch ReservationError.error2 {
         print("Error cliente ya con una reserva")
     }catch ReservationError.error3{
-        print("Error reserva inexistente")
+        print("Error eserva no existe")
+    }catch ReservationError.error4{
+        print("Error entrada de parámetros")
     }catch{
         print("Error inexperado")
     }
@@ -211,12 +221,53 @@ func testReservationPrice() {
     }catch ReservationError.error2 {
         print("Error cliente ya con una reserva")
     }catch ReservationError.error3{
-        print("Reserva no existente")
+        print("Error eserva no existe")
+    }catch ReservationError.error4{
+        print("Error entrada de parámetros")
     }catch{
         print("Error inexperado")
     }
 }
 testReservationPrice()
+
+func testParameterEntryError() {
+    print("🟡 Test para comprobar la entrade de parámetros de una nueva reserva 🟡")
+    
+    do {
+        print("Realizo reserva con parámetros erroneos")
+        try reservationManager.addReservation(hotelName: "", clients: [client11], duration: 5, price: 20.50, breakfast: true)
+    }catch ReservationError.error4{
+        print("Error entrada de parámetros")
+    }catch{
+        print("Error inexperado")
+    }
+    do {
+        print("Realizo reservas con parámetros erroneos")
+        try reservationManager.addReservation(hotelName: "Luchadores", clients: [], duration: 5, price: 20.50, breakfast: true)
+    }catch ReservationError.error4{
+        print("Error entrada de parámetros")
+    }catch{
+        print("Error inexperado")
+    }
+    do {
+        print("Realizo reservas con parámetros erroneos")
+        try reservationManager.addReservation(hotelName: "Luchadores", clients: [client11], duration: -5, price: 20.50, breakfast: true)
+    }catch ReservationError.error4{
+        print("Error entrada de parámetros")
+    }catch{
+        print("Error inexperado")
+    }
+    do {
+        print("Realizo reservas con parámetros erroneos")
+        try reservationManager.addReservation(hotelName: "Luchadores", clients: [client11], duration: 5, price: -20.50, breakfast: true)
+    }catch ReservationError.error4{
+        print("Error entrada de parámetros")
+    }catch{
+        print("Error inexperado")
+    }
+}
+
+testParameterEntryError()
 
 // Test para comprobar el método que devuelve todas las reservas
 func testSeeActiveReservations () {
